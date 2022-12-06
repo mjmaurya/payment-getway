@@ -32,3 +32,34 @@ export const updateServerOrder=async(order)=>{
         return({success:false,...error})
     }
 }
+
+export const serverPaymets=async(option)=>{
+    const query={
+        status:undefined,
+        user_order_id:undefined
+    }
+    if (option.status) {
+        query["status"]=`payment_status='${option.status}'`
+    }
+    if (option.user_order_id) {
+        query["user_order_id"]=`user_order_id=${option.user_order_id}`
+    }
+    try {
+        const dbQuery=`SELECT * FROM grinzy_dev.payment where ${query.status??'payment_status is not null'} 
+        and ${query.user_order_id??'user_order_id is not null'}
+        LIMIT ${option.limit?option.limit:10} OFFSET ${option.page?(option.page-1)*option.limit:0}`;
+        return new Promise((resolve)=>{
+            pool.query( dbQuery,
+            (err,result)=>{
+                if (err) {
+                    resolve({success:false,...err})
+                } else {
+                    resolve({success:true,...{payments:result}})
+                }
+            })
+        })
+    } catch (error) {
+        console.log("catch Error=",error);
+        return({success:false,...error})
+    }
+}

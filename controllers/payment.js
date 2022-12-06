@@ -2,7 +2,7 @@ import { attributeValidator } from "../utils/attributeValidator.js"
 import { allPayments, createPaymentOrder, paymentByPaymentId, refundPayment, refundPaymentList } from "../razorpay/index.js";
 import { createError } from "../utils/error.js";
 import { LoG } from "../logger/logger.js";
-import { createServerOrder, updateServerOrder } from "../database/operations.js";
+import { createServerOrder, serverPaymets, updateServerOrder } from "../database/operations.js";
 const logger = new LoG("Payment_Controller")
 
 
@@ -44,20 +44,17 @@ export const verifyPayment =async(req, res, next) => {
 export const allPaymentsList=async (req, res, next) => {
     const options = {
         from: req.body.from,  // amount in the smallest currency unit
-        to: req.body.to
+        to: req.body.to,
+        count:req.query.limit,
+        skip:req.query.page
+
     }
-    const attr = attributeValidator(options);
-    if (attr.success) {
         const payments = await allPayments(options)
         if (payments.success) {
-            logger.info(JSON.stringify(payments))
-            res.status(201).send(payments)
+            res.status(200).send(payments)
         } else {
             next(createError(payments.statusCode, payments.error["description"]))
         }
-    } else {
-        next(createError(400, attr.message))
-    }
 }
 
 export const payment=async (req, res, next) => {
@@ -66,8 +63,7 @@ export const payment=async (req, res, next) => {
     if (attr.success) {
         const payments = await paymentByPaymentId(paymentId)
         if (payments.success) {
-            logger.info(JSON.stringify(payments))
-            res.status(201).send(payments)
+            res.status(200).send(payments)
         } else {
             next(createError(payments.statusCode, payments.error["description"]))
         }
@@ -89,7 +85,6 @@ export const refund=async  (req, res, next) => {
     if (attr.success) {
         const refund = await refundPayment(paymentId,options)
         if (refund.success) {
-            logger.info(JSON.stringify(refund))
             res.status(201).send(refund)
         } else {
             next(createError(refund.statusCode, refund.error["description"]))
@@ -112,12 +107,26 @@ export const refundList=async  (req, res, next) => {
     if (attr.success) {
         const refunds = await refundPaymentList(paymentId,options)
         if (refunds.success) {
-            logger.info(JSON.stringify(refunds))
-            res.status(201).send(refunds)
+            res.status(200).send(refunds)
         } else {
             next(createError(refunds.statusCode, refunds.error["description"]))
         }
     } else {
         next(createError(400, attr.message))
     }
+}
+
+export const serverPaymentsList=async (req, res, next) => {
+    const options = {
+        status: req.query.status,
+        user_order_id:req.query.user_order_id,
+        limit: req.query.limit,
+        page:req.query.page
+    }
+        const payments = await serverPaymets(options)
+        if (payments.success) {
+            res.status(200).send(payments)
+        } else {
+            next(createError(payments.statusCode, payments?.error?.description))
+        }
 }
