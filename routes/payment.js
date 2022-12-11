@@ -1,5 +1,5 @@
 import express from 'express';
-import { allPaymentsList, createOrder, payment, refund, refundList, serverPaymentsList, verifyPayment } from '../controllers/payment.js';
+import { allPaymentsList, captureTrigger, createOrder, payment, refund, refundList, serverPaymentsList, verifyPayment } from '../controllers/payment.js';
 import { authorizePayment } from '../middleware/authorizePayment.js';
 
 const router = express.Router()
@@ -10,6 +10,7 @@ router.get("/server/payments",serverPaymentsList)
 router.get("/payments/:paymentId",payment)
 router.get("/payments/:paymentId/refund",refund)
 router.get("/payments/:paymentId/refunds",refundList)
+// router.post("/trigger",captureTrigger)
     
    
 

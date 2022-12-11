@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { validateRequest } from "./middleware/validateRequest.js";
+import { captureTrigger } from "./controllers/payment.js";
 const app=express();
 dotenv.config();
 app.use(cors());
@@ -15,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 app.use("/api/v1/payment",validateRequest,paymentRoute)
-
+app.post("/api/v1/payments/trigger",captureTrigger)
 app.use(ErrorHandler);
 
 app.listen(8800,()=>{

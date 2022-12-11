@@ -7,7 +7,6 @@ export const authorizePayment = (req, res, next) => {
         razorpay_payment_id: req.body.razorpay_payment_id,
         razorpay_signature: req.body.razorpay_signature
     }
-    console.log(req.body);
     let attr = attributeValidator(options);
     if (attr.success) {
         let body = req.body.razorpay_order_id + "|" + req.body.razorpay_payment_id;
